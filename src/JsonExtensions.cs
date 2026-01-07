@@ -36,9 +36,9 @@ namespace Sufficit.Json
             => !string.IsNullOrWhiteSpace(source) ? System.Text.Json.JsonSerializer.Deserialize(source, type, options ?? Sufficit.Json.JsonSerializer.Options) : default;
 
 #if NETSTANDARD2_0
-        public static T FromJsonOrDefault<T>(string? source, JsonSerializerOptions? options = null) where T : class
+        public static T FromJsonOrDefault<T>(this string? source, JsonSerializerOptions? options = null) where T : class
 #else
-        public static T? FromJsonOrDefault<T>(string? source, JsonSerializerOptions? options = null) where T : class
+        public static T? FromJsonOrDefault<T>(this string? source, JsonSerializerOptions? options = null) where T : class
 #endif
         {
             if (string.IsNullOrWhiteSpace(source)) return default;
