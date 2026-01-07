@@ -34,9 +34,9 @@
 		<PackageId>Sufficit.Json</PackageId>
 		<PackageDescription>JSON utilities for Sufficit ecosystem</PackageDescription>
 		<RepositoryType>git</RepositoryType>
-		<RepositoryUrl>https://github.com/sufficit/sufficit-base</RepositoryUrl>
-		<PackageProjectUrl>https://github.com/sufficit/sufficit-base</PackageProjectUrl>
-		<PackageIconUrl>https://raw.githubusercontent.com/sufficit/sufficit-base/main/icon.ico</PackageIconUrl>
+		<RepositoryUrl>https://github.com/sufficit/sufficit-json</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/sufficit/sufficit-json</PackageProjectUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/sufficit/sufficit-json/main/icon.png</PackageIconUrl>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
 		<PackageLicenseFile>license</PackageLicenseFile>
@@ -45,15 +45,15 @@
 	</PropertyGroup>
 
 	<ItemGroup Label="Sufficit Pack Items">
-		<None Include="../../icon.png">
+		<None Include="../icon.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
-		<None Include="../../license">
+		<None Include="../license">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
-		<None Include="../../readme.md">
+		<None Include="../readme.md">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
