@@ -7,6 +7,7 @@ using System.Text.Json;
 
 namespace Sufficit.Json
 {
+    [AutoRegisterConverter]
     public class NullableGuidConverter : JsonConverter<Guid?>
     {
         public override Guid? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions _)

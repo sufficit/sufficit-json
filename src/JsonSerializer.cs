@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -17,6 +21,98 @@ namespace Sufficit.Json
     /// </summary>
     public static partial class JsonSerializer
     {
+        /// <summary>
+        /// Automatically discovers and adds JSON converters marked with AutoRegisterConverterAttribute
+        /// from all loaded Sufficit assemblies
+        /// </summary>
+        public static void AddAutoRegisteredConverters(this IList<JsonConverter> converters)
+        {
+            var loadedAssemblies = new HashSet<Assembly>();
+            
+            // First, get all already loaded Sufficit assemblies
+            var alreadyLoaded = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => a.GetName().Name?.StartsWith("Sufficit.") == true)
+                .ToArray();
+            
+            foreach (var assembly in alreadyLoaded)
+            {
+                loadedAssemblies.Add(assembly);
+            }
+            
+            // Then, try to load additional Sufficit assemblies that might not be loaded yet
+            // This is important for test environments where not all assemblies are pre-loaded
+            try
+            {
+                var entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+                var assemblyLocation = Path.GetDirectoryName(entryAssembly.Location);
+                
+                if (assemblyLocation != null)
+                {
+                    // Look for Sufficit assemblies in the same directory
+                    var sufficitAssemblyFiles = Directory.GetFiles(assemblyLocation, "Sufficit.*.dll")
+                        .Where(file => !Path.GetFileName(file).StartsWith("Sufficit.EndPointsTests"))
+                        .ToArray();
+                    
+                    foreach (var assemblyFile in sufficitAssemblyFiles)
+                    {
+                        try
+                        {
+                            var assemblyName = Path.GetFileNameWithoutExtension(assemblyFile);
+                            if (!loadedAssemblies.Any(a => a.GetName().Name == assemblyName))
+                            {
+                                var assembly = Assembly.LoadFrom(assemblyFile);
+                                loadedAssemblies.Add(assembly);
+                            }
+                        }
+                        catch
+                        {
+                            // Skip assemblies that cannot be loaded
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If we can't load additional assemblies, continue with what we have
+            }
+            
+            // Process all loaded Sufficit assemblies
+            foreach (var assembly in loadedAssemblies.OrderBy(a => a.GetName().Name))
+            {
+                try
+                {
+                    var converterTypes = assembly.GetTypes()
+                        .Where(t => t.IsClass && !t.IsAbstract && 
+                                   t.GetCustomAttributes(typeof(AutoRegisterConverterAttribute), false).Any() &&
+                                   typeof(JsonConverter).IsAssignableFrom(t));
+
+                    foreach (var converterType in converterTypes)
+                    {
+                        try
+                        {
+                            // Check if converter of this type is already added
+                            if (!converters.Any(c => c.GetType() == converterType))
+                            {
+                                var instance = Activator.CreateInstance(converterType);
+                                if (instance is JsonConverter converter)
+                                {
+                                    converters.Add(converter);
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // Skip converters that cannot be instantiated
+                        }
+                    }
+                }
+                catch
+                {
+                    // Skip assemblies that cannot be loaded or have issues
+                }
+            }
+        }
+
         /// <summary>
         /// Use default json options
         /// </summary>
@@ -41,14 +137,31 @@ namespace Sufficit.Json
                 NumberHandling = JsonNumberHandling.AllowReadingFromString,
             };
 
-            // options.Converters.Add(new JsonStringEnumConverter(namingPolicy, true));
-            options.Converters.Add(new JsonStringEnumConverter());
-            options.Converters.Add(new JsonStringTypeConverter());
-            options.Converters.Add(new GuidConverter());
-            options.Converters.Add(new NullableGuidConverter());
-            // options.Converters.Add(new ExceptionConverter());
-            // options.Converters.Add(new RFC2822DateTimeConverter());
+            // Add auto-registered converters from all Sufficit assemblies
+            options.Converters.AddAutoRegisteredConverters();
+            
             return options;
+        }
+        
+        /// <summary>
+        ///     Used from database functions, throws on null
+        /// </summary>
+        public static T FromJson<T>(string source, JsonSerializerOptions? options = null) where T : class
+            => Deserialize<T>(source, options)!;
+
+#if NETSTANDARD2_0
+        public static T FromJsonOrDefault<T>(string? source, JsonSerializerOptions? options = null) where T : class
+#else
+        public static T? FromJsonOrDefault<T>(string? source, JsonSerializerOptions? options = null) where T : class
+#endif
+        {
+            if (string.IsNullOrWhiteSpace(source)) return null;
+
+            try
+            {
+                return FromJson<T>(source, options);
+            }
+            catch { return null; }
         }
     }
 }

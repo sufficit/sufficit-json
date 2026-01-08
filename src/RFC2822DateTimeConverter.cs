@@ -32,7 +32,7 @@ namespace Sufficit.Json
                 // Escreve o valor DateTime no formato RFC 2822 (opcional)
                 string formattedDate = value.Value.ToString(_format, CultureInfo.InvariantCulture);
                 writer.WriteStringValue(formattedDate);
-            }
+            } 
             else
             {
                 writer.WriteNullValue();

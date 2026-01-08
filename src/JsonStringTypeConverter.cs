@@ -4,8 +4,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
-namespace Sufficit
+namespace Sufficit.Json
 {
+    [AutoRegisterConverter]
     public class JsonStringTypeConverter : JsonConverter<Type>
     {
         public override Type? Read(

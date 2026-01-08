@@ -7,6 +7,7 @@ using System.Text.Json;
 
 namespace Sufficit.Json
 {
+    [AutoRegisterConverter]
     public class GuidConverter : JsonConverter<Guid>
     {
         public override Guid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions _)
@@ -24,7 +25,7 @@ namespace Sufficit.Json
         public override void Write(Utf8JsonWriter writer, Guid data, JsonSerializerOptions _)
         {
             // default guid to string representation
-            writer.WriteStringValue(data.ToString());
+            writer.WriteStringValue(data.ToString());            
         }
     }
 }

@@ -8,17 +8,6 @@ using System.Text.Json.Serialization;
 
 namespace Sufficit.Json
 {
-    /// <summary>
-    /// JSON utility extensions for Sufficit platform.
-    /// 
-    /// These utilities were moved from sufficit-utils to sufficit-base on 2025-01-08
-    /// to centralize shared JSON functionality in the base layer, eliminating duplication
-    /// and ensuring consistent JSON handling across all projects in the Sufficit ecosystem.
-    /// 
-    /// This follows the architectural principle where sufficit-base contains core DTOs,
-    /// interfaces, models, and shared contracts, while sufficit-utils focuses on
-    /// extension methods and helper functions for business logic.
-    /// </summary>
     public static class JsonExtensions
     {
         public static IServiceCollection AddJsonOptions(this IServiceCollection services)
@@ -31,31 +20,16 @@ namespace Sufficit.Json
 
         public static T? FromJson<T>(this string? source, JsonSerializerOptions? options = null)
             => !string.IsNullOrWhiteSpace(source) ? System.Text.Json.JsonSerializer.Deserialize<T>(source, options ?? Sufficit.Json.JsonSerializer.Options) : default;
-
+        
         public static object? FromJson(this string? source, Type type, JsonSerializerOptions? options = null)
             => !string.IsNullOrWhiteSpace(source) ? System.Text.Json.JsonSerializer.Deserialize(source, type, options ?? Sufficit.Json.JsonSerializer.Options) : default;
-
-#if NETSTANDARD2_0
-        public static T FromJsonOrDefault<T>(this string? source, JsonSerializerOptions? options = null) where T : class
-#else
-        public static T? FromJsonOrDefault<T>(this string? source, JsonSerializerOptions? options = null) where T : class
-#endif
-        {
-            if (string.IsNullOrWhiteSpace(source)) return default;
-
-            try
-            {
-                return System.Text.Json.JsonSerializer.Deserialize<T>(source, options ?? Sufficit.Json.JsonSerializer.Options);
-            }
-            catch { return default; }
-        }
 
         public static string? ToJson(this object? source, JsonSerializerOptions? options = null)
             => source?.ToJson(source.GetType(), options);
 
         public static string ToJson(this object? source, Type type, JsonSerializerOptions? options = null)
             => System.Text.Json.JsonSerializer.Serialize(source, type, options ?? Sufficit.Json.JsonSerializer.Options);
-
+        
         public static string ToJson<T>(this object? source, JsonSerializerOptions? options = null)
             => source.ToJson(typeof(T), options);
 
@@ -75,7 +49,7 @@ namespace Sufficit.Json
             try
             {
                 return source.ToJson(options);
-            }
+            } 
             catch { return null; }
         }
 
@@ -111,7 +85,25 @@ namespace Sufficit.Json
             if (source is null) return default!;
 
             var serialized = source.ToJson<T>();
-            return System.Text.Json.JsonSerializer.Deserialize<T>(serialized, Sufficit.Json.JsonSerializer.Options)!;
+
+            // initialize inner objects individually
+            // for example in default constructor some list property initialized with some values,
+            // but in 'source' these items are cleaned -
+            // without ObjectCreationHandling.Replace default constructor values will be added to result
+            var options = new JsonSerializerOptions();
+#if NET6_0_OR_GREATER
+            options.PreferredObjectCreationHandling = JsonObjectCreationHandling.Replace;
+#endif
+            return JsonSerializer.Deserialize<T>(serialized, options);
+        }
+
+        /// <summary>
+        /// Adds all Sufficit JSON converters to the JsonSerializerOptions
+        /// </summary>
+        public static JsonSerializerOptions AddSufficitConverters(this JsonSerializerOptions options)
+        {
+            Sufficit.Json.JsonSerializer.AddAutoRegisteredConverters(options.Converters);
+            return options;
         }
     }
 }
