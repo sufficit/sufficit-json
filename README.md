@@ -1,6 +1,7 @@
-# Sufficit.Json
-<a href="https://github.com/sufficit"><img src="https://avatars.githubusercontent.com/u/66928451?s=200&v=4" alt="Sufficit Logo" width="80" align="right">
-</a>
+<h1>
+  Sufficit.Json
+  <a href="https://github.com/sufficit"><img src="https://avatars.githubusercontent.com/u/66928451?s=200&v=4" alt="Sufficit Logo" width="80" align="right"></a>
+</h1>
 
 [![NuGet](https://img.shields.io/nuget/v/Sufficit.Json.svg)](https://www.nuget.org/packages/Sufficit.Json/)
 
