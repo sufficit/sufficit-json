@@ -91,14 +91,6 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
-	<!-- Default versioning for any unhandled frameworks -->
-	<PropertyGroup Label="Sufficit Versioning Options Default">
-		<PkgVersion>[6.*,10.0.0)</PkgVersion>
-		<PkgVersionUntil8>[*,10.0.0)</PkgVersionUntil8>
-		<LangVersion>10.0</LangVersion>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
 	<!-- #endregion -->
 
 	<ItemGroup>
