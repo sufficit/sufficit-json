@@ -1,5 +1,6 @@
-src/obj/
-src/bin/
+**/obj/
+**/bin/
+**/tmp/
 .vs/
 *.user
 *-local.csproj
