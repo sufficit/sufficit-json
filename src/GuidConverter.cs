@@ -18,14 +18,17 @@ namespace Sufficit.Json
             if (string.IsNullOrWhiteSpace(value))
                 return Guid.Empty;
 
-            // default string to guid converter
-            return Guid.Parse(value);
+            // accepts D, N, B and P formats; throws for unrecognized values
+            if (Guid.TryParse(value, out var result))
+                return result;
+
+            throw new JsonException($"The value '{value}' could not be converted to a Guid.");
         }
 
         public override void Write(Utf8JsonWriter writer, Guid data, JsonSerializerOptions _)
         {
             // default guid to string representation
-            writer.WriteStringValue(data.ToString());            
+            writer.WriteStringValue(data.ToString());
         }
     }
 }

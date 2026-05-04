@@ -16,10 +16,16 @@ namespace Sufficit.Json
                 return null;
 
             // reads parsed data as string
-            string value = reader.GetString()!;
+            string? value = reader.GetString();
 
-            // default string to guid converter
-            return Guid.Parse(value);
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            // accepts D, N, B and P formats; throws for unrecognized values
+            if (Guid.TryParse(value, out var result))
+                return result;
+
+            throw new JsonException($"The value '{value}' could not be converted to a Guid.");
         }
 
         public override void Write(Utf8JsonWriter writer, Guid? data, JsonSerializerOptions _)
