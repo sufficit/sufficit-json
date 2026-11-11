@@ -86,11 +86,15 @@
 	</PropertyGroup>
 
 	<!-- #endregion -->
+	<PropertyGroup>
+		<DiVersion>$(PkgVersion)</DiVersion>
+		<DiVersion Condition="'$(TargetFramework)' == 'net7.0'">[7.*,9.0.0)</DiVersion>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="System.Text.Json" Version="[8.0.5,9.0.0)" Condition=" '$(TargetFramework)' == 'net7.0' " />
 		<PackageReference Include="System.Text.Json" Version="$(PkgVersion)" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'net10.0'" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(PkgVersion)" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DiVersion)" />
 	</ItemGroup>
 	
 </Project>

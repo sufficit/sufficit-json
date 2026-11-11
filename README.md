@@ -74,3 +74,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Sufficit - [contato@sufficit.com.br](mailto:contato@sufficit.com.br)
 
 Project Link: [https://github.com/sufficit/sufficit-json](https://github.com/sufficit/sufficit-json)
+
+[Compatibilidade DI dos consumidores](docs/PLAN-CONNECTOR-DI-COMPATIBILITY.md).
